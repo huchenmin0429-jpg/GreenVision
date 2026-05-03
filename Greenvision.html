@@ -4258,8 +4258,8 @@
     // GitHub Pages部署默认使用纯前端助手；如后续接入云函数，可填入endpoint并启用。
     const isLocalPreview = ['localhost', '127.0.0.1', ''].includes(window.location.hostname);
     const remoteAssistantConfig = {
-      enabled: isLocalPreview,
-      endpoint: isLocalPreview ? 'http://localhost:3001/api/chat' : '',
+      enabled: true,
+      endpoint: isLocalPreview ? 'http://localhost:3001/api/chat' : 'https://green-vision-rho.vercel.app/api/chat',
       clientKey: 'greenvision-secret-key-2024'
     };
 

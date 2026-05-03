@@ -168,7 +168,11 @@ app.post('/api/chat', authenticate, limiter, async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`GreenVision proxy listening on port ${PORT}`);
-  console.log(`Health check: /health`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`GreenVision proxy listening on port ${PORT}`);
+    console.log(`Health check: /health`);
+  });
+}
+
+module.exports = app;

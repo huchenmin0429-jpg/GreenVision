@@ -884,8 +884,9 @@
             </div>
             <div id="previewGrid" class="preview-grid"></div>
           </div>
+          <p style="margin: 12px 4px 0; color: var(--text-muted); font-size: 14px; line-height: 1.7; text-align: center;">上传包含植物的图片后，系统会识别植被覆盖情况，并估算对应的碳吸收表现。</p>
           <div class="action-row">
-            <button class="btn btn-primary" id="analyzeBtn" style="flex:1;">✨ 启动本地引擎分析</button>
+            <button class="btn btn-primary" id="analyzeBtn" style="flex:1;">✨ 开始分析</button>
             <button class="btn btn-outline" id="clearBtn">重置</button>
           </div>
           <div class="status-box" id="statusBox"></div>
@@ -1010,24 +1011,47 @@
     <section class="section" style="max-width: 900px;">
       <h2 class="section-title">科学依据</h2>
       <div class="data-card">
-        <h3 id="algorithm-model" style="color: var(--primary); margin-top: 30px; margin-bottom: 15px;">算法与生态学模型</h3>
-        <p><span class="highlight-text">纯净体验 (Serverless架构)：</span>本应用程序运行于您的本地设备，采用了简化的色相与亮度判定矩阵以区分图像中的绿叶素特征区域，无后端服务，确保隐私绝对安全。</p>
-        <p><span class="highlight-text">植被形态学映射：</span>我们为不同浓度比例的绿色影像应用了分类机制。低于15%浓度的绿意被折算为“草场生态”，15%-35%视为“灌木生态”，高于此数值则应用“乔木森林”的高能固碳预估。</p>
-        <p><span class="highlight-text">前沿碳吸收预估：</span>系统集成了针对性乔木评估公式（综合预估树木胸径与成长高度的变量），为您计算出对应的年度碳抵消力。等效计算采用“一棵树≈22kg/年”的基础锚点换算参考标准。</p>
-        
-        <h3 id="research-basis" style="color: var(--primary); margin-top: 30px; margin-bottom: 15px;">科学研究依据</h3>
-        <p><span class="highlight-text">碳汇能力研究：</span>根据中国科学院生态环境研究中心的研究，不同植被类型的碳汇能力存在显著差异。森林生态系统的碳汇能力最强，其次是草地和湿地。</p>
-        <p><span class="highlight-text">城市绿化效益：</span>根据清华大学建筑学院的研究，城市绿化不仅能够吸收二氧化碳，还能降低城市热岛效应，改善空气质量，提高居民生活质量。</p>
-        <p><span class="highlight-text">植物生长模型：</span>系统采用了国际通用的植物生长模型，结合当地气候、土壤条件，预测植物的生长状况和碳吸收能力。</p>
-        
-        <h3 id="data-sources" style="color: var(--primary); margin-top: 30px; margin-bottom: 15px;">数据来源</h3>
-        <p><span class="highlight-text">气候数据：</span>来源于国家气象数据中心，包括温度、降水、日照等历史数据。</p>
-        <p><span class="highlight-text">土壤数据：</span>来源于国家土壤数据库，包括土壤类型、肥力、酸碱度等信息。</p>
-        <p><span class="highlight-text">植物特性：</span>来源于中国植物志和相关研究文献，包括不同植物的生长习性、碳吸收能力等信息。</p>
-        <p><span class="highlight-text">植被碳吸收数据：</span>基于国内外权威生态学研究机构公开的碳吸收速率数据，包括IPCC（联合国政府间气候变化专门委员会）发布的《土地利用、土地利用变化和林业特别报告》。</p>
-        <p><span class="highlight-text">城市气候数据：</span>结合国家气象数据中心和各地方气象局的历史气候数据，为不同城市提供精准的气候参数。</p>
-        <p><span class="highlight-text">植物数据库：</span>整合了《中国植物志》、《中国植被》等权威资料，以及各地区植物志和生态研究文献，构建了包含常见植物生长特性、适应性、维护成本等信息的综合数据库。</p>
-        <p><span class="highlight-text">算法模型：</span>采用了国际通用的植物生长模型和碳吸收估算方法，参考了《森林生态系统碳储量和碳汇能力评估技术规范》等标准。</p>
+        <h3 id="project-position" style="color: var(--primary); margin-top: 30px; margin-bottom: 15px;">项目定位与评估链路</h3>
+        <p><span class="highlight-text">GreenVision 的定位：</span>GreenVision 是面向城市绿化评估、生态碳汇估算和绿化方案辅助决策的智能视觉工具。它不是单纯判断“图片里有没有植物”，而是把“计算机视觉 + 城市生态指标 + 碳汇估算 + 绿化建议”连成一个完整流程。</p>
+        <p><span class="highlight-text">核心工作链路：</span>用户上传街景、绿地照片或规划图纸后，系统识别画面中的植被区域，计算可视绿量、绿化占比或潜在绿化面积，再结合城市气候、土壤类型和优化目标，生成碳吸收估算、绿化建议和生态效益说明。</p>
+        <p><span class="highlight-text">应用场景：</span>该工具适合校园绿化评估、社区绿化改造、街道绿视率调查、城市更新方案比选、园林规划初步评估、低碳宣传教育和环保比赛展示等场景，帮助用户用更低门槛理解绿化价值。</p>
+
+        <h3 id="gvi-basis" style="color: var(--primary); margin-top: 30px; margin-bottom: 15px;">绿视率与可视绿量依据</h3>
+        <p><span class="highlight-text">Green View Index（GVI）：</span>绿视率是一种从行人视角衡量城市绿化可见程度的指标。它不同于从卫星或遥感影像计算的 NDVI，更关注人在街道、社区或校园中实际能看到多少绿色植被，因此适合评价街道体验、慢行环境、城市景观品质和居民绿色暴露。</p>
+        <p><span class="highlight-text">GVI 基本公式：</span>绿视率的核心思想是“绿色植被像素数 / 图像总像素数”。如果需要百分比表达，则为：GVI(%) = 绿色植被像素数 / 图像总像素数 × 100%。GreenVision 的核心测算沿用了这一思路：先识别植被像素，再计算其在画面中的占比。</p>
+        <p><span class="highlight-text">GVI 与 NDVI 的区别：</span>NDVI 通常基于遥感影像，从俯视角度判断地表植被覆盖；GVI 基于街景或普通照片，从人眼视角判断绿色可见程度。NDVI 适合宏观监测植被覆盖和时间序列变化，GVI 更适合描述人在城市空间中的绿色感知。</p>
+        <p><span class="highlight-text">为什么从行人视角评估：</span>传统绿地率多从土地面积或规划统计出发，但居民真实感受到的绿色空间，还受到树木高度、道路宽度、建筑遮挡、灌草配置和视线开敞程度影响。街景绿视率可以补充传统平面指标，发现“地图上有绿地但街道体验不足”的问题。</p>
+
+        <h3 id="vision-model" style="color: var(--primary); margin-top: 30px; margin-bottom: 15px;">图像识别与语义分割依据</h3>
+        <p><span class="highlight-text">语义分割的作用：</span>语义分割是计算机视觉中的像素级分类任务。它不是只判断图片中是否有树，而是尽量判断每一个像素属于树木、草地、道路、建筑、天空或其他背景中的哪一类。绿视率、绿化覆盖占比和碳汇估算都依赖于对植被区域的识别。</p>
+        <p><span class="highlight-text">DeepLabv3 思路：</span>DeepLabv3 使用空洞卷积扩大感受野，并通过多尺度模块捕捉不同大小的上下文信息。用于城市绿化图像时，它的意义在于：模型不只看局部颜色，还会结合上下文判断哪些区域更可能是树冠、草地或灌木。</p>
+        <p><span class="highlight-text">DeepLabv3+ 思路：</span>DeepLabv3+ 在 DeepLabv3 的基础上加入编码器-解码器结构，使用解码器细化分割边界，并结合深度可分离卷积提升效率。对于树冠边缘、草地边界、建筑和天空交界处，边界细化有助于减少绿化面积估算误差。</p>
+        <p><span class="highlight-text">为什么不只用颜色阈值：</span>单纯把“绿色像素”判定为植物，容易受到光照、阴影、季节、相机色彩和绿色非植被物体影响。语义分割能结合纹理、形状和上下文，通常比单纯颜色阈值更稳健。GreenVision 的展示版保留轻量化本地识别，但理论依据借鉴的是语义分割思路。</p>
+        <p><span class="highlight-text">本地隐私保护：</span>核心测算在浏览器本地完成，图片不会上传到云端数据库。这使它适合演示、课堂、比赛和公众参与场景，也降低了用户上传校园、社区或街道照片时的隐私顾虑。</p>
+
+        <h3 id="carbon-basis" style="color: var(--primary); margin-top: 30px; margin-bottom: 15px;">碳储量、碳汇与生态效益依据</h3>
+        <p><span class="highlight-text">碳储量与碳汇区别：</span>碳储量表示已经储存在树干、树枝、树叶和根系等生物量中的碳；碳汇或固碳量更强调一段时间内新吸收和固定的碳。GreenVision 的结果应理解为年度固碳潜力和生态效益估算，而不是正式碳资产核证。</p>
+        <p><span class="highlight-text">城市树木的作用：</span>城市树木通过生长吸收大气中的二氧化碳，并将碳储存在自身生物量中。乔木、灌木和草地的固碳能力不同，通常与叶面积、生长速度、树龄、胸径、树高、根系和养护条件有关。</p>
+        <p><span class="highlight-text">i-Tree 的参考意义：</span>i-Tree 是美国林务局等机构开发的城市与乡村林业生态效益评估工具，可用于量化树木提供的碳储存、碳汇、空气质量改善、雨洪截留和节能等效益。GreenVision 借鉴这种思路，把图像识别结果转化为更容易理解的生态效益报告。</p>
+        <p><span class="highlight-text">研究数据示例：</span>Nowak 与 Crane 关于美国城市树木的研究表明，城市森林具有可量化的碳储存和固碳价值。该研究不能直接套用于中国城市，但可以作为“城市树木碳汇价值可以被量化评估”的研究依据。</p>
+        <p><span class="highlight-text">估算模型边界：</span>严格碳汇核算需要树种、胸径、树高、年龄、生长状况、土壤、气候和养护条件等数据。GreenVision 更适合作为辅助评估和方案比较工具，用低门槛视觉识别快速给出初步估算。</p>
+
+        <h3 id="planning-basis" style="color: var(--primary); margin-top: 30px; margin-bottom: 15px;">图纸绿化建议与规划依据</h3>
+        <p><span class="highlight-text">图纸识别逻辑：</span>工程图纸上传后，系统会结合图纸边界、比例尺和可绿化区域估算场地规模。比例尺越准确，换算出的实际绿化面积、植物数量、维护成本和碳吸收潜力越可靠。</p>
+        <p><span class="highlight-text">城市位置的作用：</span>不同城市的温度、降水、湿润程度和极端气候不同，会直接影响植物的成活率、生长速度和维护难度。因此图纸绿化建议需要地理位置作为植物适生性判断依据。</p>
+        <p><span class="highlight-text">土壤类型的作用：</span>壤土、沙土、黏土和泥炭土在保水性、透气性、排水性和养分条件上差异明显，会影响植物配置。系统通过土壤类型辅助判断植物是否适合长期生长。</p>
+        <p><span class="highlight-text">优化目标的作用：</span>当用户选择“碳汇最大化、经济效益优先、综合考量或景观美化”时，系统会调整方案偏向：碳汇目标更重视高固碳植物，经济目标更重视维护成本和收益平衡，景观目标更重视观赏性和空间效果。</p>
+
+        <h3 id="policy-basis" style="color: var(--primary); margin-top: 30px; margin-bottom: 15px;">政策与标准化趋势依据</h3>
+        <p><span class="highlight-text">城市园林绿化政策意义：</span>住房城乡建设部关于促进城市园林绿化事业健康发展的相关意见指出，城市园林绿化承担生态环保、休闲游憩、景观营造、文化传承、科普教育、防灾避险等多种功能，是改善人居环境和促进城市可持续发展的重要内容。</p>
+        <p><span class="highlight-text">从数量到质量：</span>相关政策强调城市园林绿化要从重数量向量质并举转变，从单一功能向复合功能转变，从重建设向建管并重、管养并重转变。GreenVision 的价值正对应这种趋势：不只统计面积，还辅助评估可视绿量、空间分布、生态效益和改造建议。</p>
+        <p><span class="highlight-text">国内碳汇标准化趋势：</span>国家林业和草原局网站报道，湖北宜昌建立城市绿地碳汇计量监测地方标准，适用于权属清晰、连续绿化面积不低于 400 平方米的公园绿地、防护绿地、区域绿地等。这说明城市绿地碳汇正在走向可监测、可核算和制度化。</p>
+
+        <h3 id="data-sources" style="color: var(--primary); margin-top: 30px; margin-bottom: 15px;">资料来源清单</h3>
+        <p><span class="highlight-text">绿视率与城市绿化：</span>Treepedia 项目；Kumakoshi et al. 2020《Standardized Green View Index and Quantification of Different Metrics of Urban Green Vegetation》；Sensors 2024 城市绿量语义分割综述。</p>
+        <p><span class="highlight-text">语义分割与模型：</span>Chen et al. 2017《Rethinking Atrous Convolution for Semantic Image Segmentation》；Chen et al. 2018《Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation》。</p>
+        <p><span class="highlight-text">碳汇与生态效益：</span>USDA Forest Service i-Tree；Nowak & Crane 2002《Carbon storage and sequestration by urban trees in the USA》；U.S. National Park Service 关于城市森林碳储量的说明。</p>
+        <p><span class="highlight-text">中国政策与标准趋势：</span>住房城乡建设部《关于促进城市园林绿化事业健康发展的指导意见》；国家林业和草原局关于湖北宜昌建立城市绿地碳汇计量监测地方标准的报道。</p>
         
         <p style="font-size:14px; color:#999; margin-top:2rem; border-top: 1px solid #eee; padding-top:1rem;">*声明：所有测算结果属于理想环境下的教学展示与功能论证数据，仅供个人碳中和意识培养参考，请勿用于正式的林区碳交易凭证。</p>
       </div>
@@ -1050,6 +1074,7 @@
             </div>
             <div id="cityBlueprintPreviewGrid" class="preview-grid"></div>
           </div>
+          <p style="margin: 12px 4px 0; color: #5d6f82; font-size: 14px; line-height: 1.7; text-align: center;">上传工程图纸后，系统会结合位置、比例和环境条件，为场地生成绿化规划建议。</p>
           
           <div style="margin-top: 1.5rem; display:flex; flex-direction:column; gap:10px;">
              <div>
@@ -1061,6 +1086,7 @@
                  </div>
                </div>
                <div id="selectedLocation" style="margin-top:10px; padding:5px 10px; background:#f0f7ff; border:1px solid #4a90e2; border-radius:4px; font-size:14px;">未选择城市</div>
+               <p style="font-size:12px; color:#7a8793; margin-top:6px;">用于匹配当地气候、降水和温度，让植物推荐更贴近实际环境。</p>
              </div>
              <div>
                <label style="font-weight:bold; display:block; margin-bottom:5px;">土壤类型：</label>
@@ -1070,6 +1096,7 @@
                   <option value="clay">黏土 (Clay)</option>
                   <option value="peat">泥炭土 (Peat)</option>
                </select>
+               <p style="font-size:12px; color:#7a8793; margin-top:6px;">不同土壤保水、透气和养分条件不同，会影响适合种植的植物类型。</p>
              </div>
              <div>
                <label style="font-weight:bold; display:block; margin-bottom:5px;">📏 图纸比例尺（像素/米）：</label>
@@ -1078,6 +1105,7 @@
                  <span style="color:#666; font-size:14px;">像素/m</span>
                </div>
                <p style="font-size:12px; color:#999; margin-top:5px;">* 图纸上已知距离的像素数除以实际距离（米）= 比例尺</p>
+               <p style="font-size:12px; color:#7a8793; margin-top:4px;">比例尺越准确，系统换算出的绿化面积和后续成本估算就越可靠。</p>
              </div>
              <!-- 图纸分析预览区域 -->
              <div id="blueprintAnalysisPreview" style="display:none; margin-top:15px;">
@@ -1095,6 +1123,7 @@
                   <option value="balance">综合考量 (Balanced)</option>
                   <option value="beauty">景观美化 (Aesthetic)</option>
                </select>
+               <p style="font-size:12px; color:#7a8793; margin-top:6px;">用于决定方案重点：更看重碳吸收、经济收益、综合平衡，还是景观效果。</p>
              </div>
           </div>
 
@@ -1155,7 +1184,6 @@
           <div class="forum-toolbar">
             <div>
               <h3 style="color:var(--primary-dark); font-size:24px; margin-bottom:4px;">社区动态</h3>
-              <p style="color:#6b7d70; font-size:14px;">本地演示版会保存在当前浏览器中，后续可升级为线上数据库。</p>
             </div>
             <button class="btn btn-outline" id="forumClearAllBtn" style="padding:12px 20px;">清空线上帖子</button>
           </div>
@@ -2439,7 +2467,7 @@
 
     analyzeBtn.addEventListener('click', async () => {
       if (selectedFiles.length === 0) {
-        showStatus('🌿 请先传入有效的生态影像图片。', true);
+        showStatus('🌿 请先上传包含植物的图片。', true);
         return;
       }
 
@@ -2469,7 +2497,7 @@
         showStatus('❌ 分析异常：' + error.message, true);
       } finally {
         analyzeBtn.disabled = false;
-        analyzeBtn.innerHTML = '✨ 启动本地引擎分析';
+        analyzeBtn.innerHTML = '✨ 开始分析';
       }
     });
 

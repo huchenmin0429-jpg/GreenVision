@@ -2316,9 +2316,43 @@
 
     function showForumStatus(message, isError = false) {
       forumStatusBox.style.display = 'block';
-      forumStatusBox.innerHTML = message;
+      forumStatusBox.innerHTML = typeof translateUIString === 'function' ? translateUIString(message) : message;
       forumStatusBox.style.background = isError ? '#fff2f0' : 'var(--primary-light)';
       forumStatusBox.style.color = isError ? '#cf1322' : 'var(--primary)';
+    }
+
+    const forumSensitivePatterns = [
+      /傻\s*[逼屄比b]/i,
+      /煞\s*笔/i,
+      /操\s*你\s*妈/i,
+      /草\s*你\s*妈/i,
+      /艹\s*你\s*妈/i,
+      /操\s*你/i,
+      /草\s*你/i,
+      /妈\s*的/i,
+      /他\s*妈\s*的/i,
+      /你\s*妈\s*死/i,
+      /死\s*全\s*家/i,
+      /滚\s*蛋/i,
+      /贱\s*人/i,
+      /狗\s*娘\s*养/i
+    ];
+
+    function normalizeForumModerationText(value) {
+      return String(value || '')
+        .toLowerCase()
+        .replace(/[^\p{Script=Han}a-z0-9]+/gu, '');
+    }
+
+    function hasForumSensitiveWords(...values) {
+      const text = normalizeForumModerationText(values.join(' '));
+      return forumSensitivePatterns.some(pattern => pattern.test(text));
+    }
+
+    function validateForumText(...values) {
+      if (!hasForumSensitiveWords(...values)) return true;
+      showForumStatus('内容包含不友善或敏感词，请调整表达后再发布。', true);
+      return false;
     }
 
     function formatForumTime(timestamp) {
@@ -2448,6 +2482,7 @@
         showForumStatus('请先写一点评论内容再发送。', true);
         return false;
       }
+      if (!validateForumText(safeAuthor, safeContent)) return false;
 
       if (forumClient && forumCommentsRemoteAvailable) {
         const { ownerId, ownerToken } = getForumIdentity();
@@ -2675,6 +2710,8 @@
       '还没有评论。可以留下一句观察、鼓励或补充建议。': 'No comments yet. Leave an observation, encouragement, or suggestion.',
       '评论已发布。': 'Comment published.',
       '请先写一点评论内容再发送。': 'Please write a comment before sending.',
+      '内容包含不友善或敏感词，请调整表达后再发布。': 'This content includes unfriendly or sensitive words. Please rephrase it before posting.',
+      '评论删除失败，请检查 Supabase 删除函数或稍后再试。': 'Comment deletion failed. Please check the Supabase delete function or try again later.',
       '开源共建': 'Open Source Collaboration',
       '生态隐私政策': 'Eco Privacy Policy',
       '开源共创': 'Open Source Collaboration',
@@ -2731,7 +2768,15 @@
       '绿化建议生成成功！': 'Greening advice generated successfully.',
       '请先上传工程划线图纸。': 'Please upload an engineering blueprint first.',
       '请在地图上选择您所在的城市。': 'Please select your city first.',
-      '图纸分析出错：': 'Blueprint analysis error:'
+      '图纸分析出错：': 'Blueprint analysis error:',
+      '部分非图片文件已被忽略。': 'Some non-image files were ignored.',
+      '请先上传包含植物的图片。': 'Please upload an image containing plants first.',
+      '正在进行快速植被识别，必要时会自动调用语义分割模型...': 'Running quick vegetation detection. Semantic segmentation will be used if needed...',
+      '快速识别中...': 'Quick detection...',
+      '快速识别引擎已启动，正在分析植被...': 'Quick detection started. Analyzing vegetation...',
+      '正在分析植被...': 'Analyzing vegetation...',
+      '语义分割分析完成，植被区域已高亮显示！': 'Semantic segmentation complete. Vegetation areas are highlighted.',
+      '分析异常：': 'Analysis error:'
     };
 
     const bilingualAttributeMap = {
@@ -2803,6 +2848,10 @@
       const body = text.slice(firstChineseIndex).trim();
       const direct = bilingualTextMap[body] || getDynamicTranslation(body);
       if (direct) return `${prefix}${direct}`.trim();
+      const imageProgressMatch = body.match(/^正在分析第\s*(\d+)\/(\d+)\s*张图片:\s*(.+)\.\.\.$/);
+      if (imageProgressMatch) {
+        return `${prefix}Analyzing image ${imageProgressMatch[1]}/${imageProgressMatch[2]}: ${imageProgressMatch[3]}...`.trim();
+      }
       const prefixKey = Object.keys(bilingualTextMap).find(key => body.startsWith(key));
       if (prefixKey) return `${prefix}${bilingualTextMap[prefixKey]}${body.slice(prefixKey.length)}`.trim();
       return text;
@@ -3288,6 +3337,10 @@
           return;
         }
 
+        if (!validateForumText(author, title, content)) {
+          return;
+        }
+
         if (!forumClient) {
           showForumStatus('Supabase 客户端未加载，请检查网络后刷新页面。', true);
           return;
@@ -3511,16 +3564,20 @@
     function updateUI() {
       if (selectedFiles.length > 0) {
         uploadBox.style.padding = '1.5rem 2rem';
-        uploadText.innerHTML = `已载入 <strong style="color:var(--primary);">1</strong> 张影像数据<br><span style="font-size: 14px; color: #999;">再次上传会替换当前图片</span>`;
+        uploadText.innerHTML = currentLanguage === 'en'
+          ? `Loaded <strong style="color:var(--primary);">1</strong> image<br><span style="font-size: 14px; color: #999;">Uploading again will replace the current image</span>`
+          : `已载入 <strong style="color:var(--primary);">1</strong> 张影像数据<br><span style="font-size: 14px; color: #999;">再次上传会替换当前图片</span>`;
       } else {
         uploadBox.style.padding = '3rem 2rem';
-        uploadText.innerHTML = `<span style="font-size:36px; display:block; margin-bottom:10px;">📥</span>拖拽上传 / 点击选择生态照片<br><span style="font-size: 14px; color: #999;">支持 JPG、PNG、WEBP，保护隐私，拒绝云端缓存</span>`;
+        uploadText.innerHTML = currentLanguage === 'en'
+          ? `<span style="font-size:36px; display:block; margin-bottom:10px;">📥</span>Drag to upload / click to choose an ecological photo<br><span style="font-size: 14px; color: #999;">Supports JPG, PNG, and WEBP. Privacy-friendly with no cloud caching.</span>`
+          : `<span style="font-size:36px; display:block; margin-bottom:10px;">📥</span>拖拽上传 / 点击选择生态照片<br><span style="font-size: 14px; color: #999;">支持 JPG、PNG、WEBP，保护隐私，拒绝云端缓存</span>`;
       }
     }
 
     function showStatus(message, isError = false) {
       statusBox.style.display = 'block';
-      statusBox.innerHTML = message;
+      statusBox.innerHTML = translateUIString(message);
       statusBox.style.background = isError ? '#fff2f0' : 'var(--primary-light)';
       statusBox.style.color = isError ? '#cf1322' : 'var(--primary)';
     }
@@ -4240,11 +4297,11 @@
 
       showStatus('⌛ 正在进行快速植被识别，必要时会自动调用语义分割模型...');
       analyzeBtn.disabled = true;
-      analyzeBtn.innerHTML = '🔍 快速识别中...';
+      analyzeBtn.innerHTML = translateUIString('🔍 快速识别中...');
 
       try {
         showStatus('✅ 快速识别引擎已启动，正在分析植被...');
-        analyzeBtn.innerHTML = '🔍 正在分析植被...';
+        analyzeBtn.innerHTML = translateUIString('🔍 正在分析植被...');
 
         const results = [];
         for (let i = 0; i < selectedFiles.length; i++) {
@@ -4264,7 +4321,7 @@
         showStatus('❌ 分析异常：' + error.message, true);
       } finally {
         analyzeBtn.disabled = false;
-        analyzeBtn.innerHTML = '✨ 开始分析';
+        analyzeBtn.innerHTML = translateUIString('✨ 开始分析');
       }
     });
 
@@ -5309,6 +5366,7 @@
         renderCityList(groupCitiesByFirstLetter(searchValue));
       }
       updateSelectedLocationText();
+      if (typeof updateUI === 'function') updateUI();
       if (typeof updateCityBpUI === 'function') updateCityBpUI();
     }
 

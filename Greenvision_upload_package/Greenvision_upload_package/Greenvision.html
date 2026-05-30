@@ -1388,29 +1388,6 @@
       font-weight: 700;
     }
 
-    .forum-comment-delete-btn {
-      margin-left: auto;
-      border: 0;
-      background: transparent;
-      color: #b42318;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 800;
-      padding: 4px 6px;
-      border-radius: 8px;
-      transition: background 0.2s ease, color 0.2s ease;
-    }
-
-    .forum-comment-delete-btn:hover {
-      background: #fff1f0;
-      color: #7a271a;
-    }
-
-    .forum-comment-delete-btn:disabled {
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-
     .forum-comment-body {
       color: #34463b;
       font-size: 14px;
@@ -2381,14 +2358,11 @@
 
     function saveLocalForumComment(postId, author, content) {
       const localComments = readLocalForumComments();
-      const { ownerId, ownerToken } = getForumIdentity();
       const nextComment = {
         id: createForumToken(),
         post_id: postId,
         author,
         content,
-        owner_id: ownerId,
-        owner_token: ownerToken,
         created_at: new Date().toISOString()
       };
       localComments[postId] = Array.isArray(localComments[postId]) ? localComments[postId] : [];
@@ -2403,7 +2377,6 @@
         post_id: comment.post_id,
         author: comment.author || '环保伙伴',
         content: comment.content || '',
-        owner_id: comment.owner_id || '',
         created_at: comment.created_at || new Date().toISOString()
       };
     }
@@ -2416,7 +2389,7 @@
 
       const { data, error } = await forumClient
         .from('forum_comments')
-        .select('id, post_id, author, content, owner_id, created_at')
+        .select('id, post_id, author, content, created_at')
         .in('post_id', postIds)
         .order('created_at', { ascending: true });
 
@@ -2473,28 +2446,6 @@
 
       saveLocalForumComment(postId, safeAuthor, safeContent);
       return true;
-    }
-
-    async function deleteForumComment(commentId, postId) {
-      if (forumClient && forumCommentsRemoteAvailable) {
-        const { ownerToken } = getForumIdentity();
-        const { error } = await forumClient.rpc('delete_forum_comment', {
-          comment_id: commentId,
-          request_owner_token: ownerToken,
-          request_admin_token: getForumAdminToken()
-        });
-        if (!error) return true;
-        console.warn('论坛评论删除失败:', error);
-        showForumStatus('评论删除失败，请检查 Supabase 删除函数或稍后再试。', true);
-        return false;
-      }
-
-      const localComments = readLocalForumComments();
-      const comments = Array.isArray(localComments[postId]) ? localComments[postId] : [];
-      const beforeLength = comments.length;
-      localComments[postId] = comments.filter(comment => comment.id !== commentId);
-      writeLocalForumComments(localComments);
-      return localComments[postId].length < beforeLength;
     }
 
     const bilingualTextMap = {
@@ -2715,23 +2666,7 @@
       '当前绿化密度良好，建议保持': 'Current greening density is good; maintain the existing level',
       '定期修剪、浇水、施肥，注意病虫害防治': 'Prune, water, and fertilize regularly; monitor pests and diseases',
       '定期修剪造型，保持通风透光，适量浇水': 'Trim regularly, keep good ventilation and light, and water moderately',
-      '定期修剪、浇水、施肥，及时清除杂草': 'Mow, water, and fertilize regularly; remove weeds in time',
-      '工程图纸上传': 'Engineering Blueprint Upload',
-      '支持 JPG、PNG、WEBP': 'Supports JPG, PNG, and WEBP',
-      '支持 JPG、PNG、WEBP，保护隐私，拒绝云端缓存': 'Supports JPG, PNG, and WEBP. Privacy-friendly with no cloud caching.',
-      '已载入': 'Loaded',
-      '份工程图纸': 'engineering blueprint',
-      '再次上传会替换当前图纸': 'Uploading again will replace the current blueprint',
-      '图纸分析结果：': 'Blueprint Analysis Results:',
-      'OpenCV 分析中...': 'OpenCV analyzing...',
-      '图纸分析中，正在使用 OpenCV 进行几何分析...': 'Analyzing the blueprint with OpenCV geometry tools...',
-      '已复用上次图纸分析结果，正在生成绿化建议...': 'Reusing the last blueprint analysis and generating greening advice...',
-      'OpenCV 图纸分析完成，正在生成绿化建议...': 'OpenCV blueprint analysis complete. Generating greening advice...',
-      'OpenCV 分析失败，将使用估算方式生成建议。': 'OpenCV analysis failed. The system will generate advice using estimates.',
-      '绿化建议生成成功！': 'Greening advice generated successfully.',
-      '请先上传工程划线图纸。': 'Please upload an engineering blueprint first.',
-      '请在地图上选择您所在的城市。': 'Please select your city first.',
-      '图纸分析出错：': 'Blueprint analysis error:'
+      '定期修剪、浇水、施肥，及时清除杂草': 'Mow, water, and fertilize regularly; remove weeds in time'
     };
 
     const bilingualAttributeMap = {
@@ -2764,14 +2699,6 @@
       const mapped = bilingualTextMap[trimmed] || getDynamicTranslation(trimmed);
       if (mapped) return { zh: trimmed, en: mapped };
 
-      const firstChineseIndex = trimmed.search(/[\u4e00-\u9fff]/);
-      if (firstChineseIndex > 0) {
-        const prefix = trimmed.slice(0, firstChineseIndex);
-        const body = trimmed.slice(firstChineseIndex).trim();
-        const bodyMapped = bilingualTextMap[body] || getDynamicTranslation(body);
-        if (bodyMapped) return { zh: trimmed, en: `${prefix}${bodyMapped}`.trim() };
-      }
-
       const separator = ' / ';
       const separatorIndex = trimmed.lastIndexOf(separator);
       if (separatorIndex <= 0) return null;
@@ -2791,21 +2718,6 @@
 
     function setManagedText(element) {
       element.textContent = currentLanguage === 'en' ? element.dataset.langEn : element.dataset.langZh;
-    }
-
-    function translateUIString(text) {
-      if (currentLanguage !== 'en') return text;
-      const parts = getBilingualParts(text);
-      if (parts) return parts.en;
-      const firstChineseIndex = text.search(/[\u4e00-\u9fff]/);
-      if (firstChineseIndex < 0) return text;
-      const prefix = text.slice(0, firstChineseIndex);
-      const body = text.slice(firstChineseIndex).trim();
-      const direct = bilingualTextMap[body] || getDynamicTranslation(body);
-      if (direct) return `${prefix}${direct}`.trim();
-      const prefixKey = Object.keys(bilingualTextMap).find(key => body.startsWith(key));
-      if (prefixKey) return `${prefix}${bilingualTextMap[prefixKey]}${body.slice(prefixKey.length)}`.trim();
-      return text;
     }
 
     function updateLanguageText(root = document) {
@@ -3029,9 +2941,6 @@
                 <div class="forum-comment-meta">
                   <span>${escapeHTML(comment.author || '环保伙伴')}</span>
                   <span>${formatForumTime(comment.created_at)}</span>
-                  ${isAdmin || comment.owner_id === ownerId
-                    ? `<button class="forum-comment-delete-btn" data-id="${comment.id}" data-post-id="${post.id}" type="button">删除</button>`
-                    : ''}
                 </div>
                 <div class="forum-comment-body">${escapeHTML(comment.content)}</div>
               </div>
@@ -3083,25 +2992,6 @@
             return;
           }
           renderForumFeed();
-        });
-      });
-
-      forumFeed.querySelectorAll('.forum-comment-delete-btn').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          const commentId = btn.getAttribute('data-id');
-          const postId = btn.getAttribute('data-post-id');
-          if (!commentId || !postId) return;
-          btn.disabled = true;
-          btn.textContent = currentLanguage === 'en' ? 'Deleting...' : '删除中...';
-          const ok = await deleteForumComment(commentId, postId);
-          if (ok) {
-            forumOpenCommentPostId = postId;
-            await renderForumFeed();
-            showForumStatus(currentLanguage === 'en' ? 'Comment deleted.' : '评论已删除。');
-          } else {
-            btn.disabled = false;
-            btn.textContent = currentLanguage === 'en' ? 'Delete' : '删除';
-          }
         });
       });
 
@@ -5526,7 +5416,7 @@
 
     function showCityBpStatus(msg, isError = false) {
       cityBpStatusBox.style.display = 'block';
-      cityBpStatusBox.innerHTML = translateUIString(msg);
+      cityBpStatusBox.innerHTML = msg;
       cityBpStatusBox.style.background = isError ? '#fff2f0' : '#e6f3ff';
       cityBpStatusBox.style.color = isError ? '#cf1322' : '#4a90e2';
     }
@@ -6065,7 +5955,7 @@
 
       showCityBpStatus('⌛ 图纸分析中，正在使用 OpenCV 进行几何分析...');
       cityBpAnalyzeBtn.disabled = true;
-      cityBpAnalyzeBtn.innerHTML = translateUIString('🔍 OpenCV 分析中...');
+      cityBpAnalyzeBtn.innerHTML = '🔍 OpenCV 分析中...';
 
       try {
         const firstFile = cityBpSelectedFiles[0];
@@ -6204,7 +6094,7 @@
         showCityBpStatus('❌ 图纸分析出错：' + error.message, true);
       } finally {
         cityBpAnalyzeBtn.disabled = false;
-        cityBpAnalyzeBtn.innerHTML = translateUIString('✨ 生成绿化建议');
+        cityBpAnalyzeBtn.innerHTML = '✨ 生成绿化建议';
       }
     });
 
@@ -6215,7 +6105,7 @@
       cityBpStatusBox.style.display = 'none';
       updateCityBpUI();
       selectedCity = null;
-      updateSelectedLocationText();
+      selectedLocation.textContent = '请在地图上选择位置';
     });
 
     function showCityReportModal(content) {
